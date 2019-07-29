@@ -1,0 +1,54 @@
+version: "3.2"
+
+services:
+  web:
+    image: nginx:latest
+    volumes:
+      - ./web:/var/www/html/
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "8081:80"
+    depends_on:
+      - php_fpm
+
+  php_fpm:
+    build: ./docker/php
+    volumes:
+      - ./web:/var/www/html
+    links:
+      - af_db
+
+  af_db:
+    image: mariadb
+    restart: always
+    # volumes:
+    #   - ./docker/data:/var/lib/mysql
+    ports:
+        - "33061:3306"
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: test123
+      MYSQL_ROOT_PASSWORD: test123
+      MYSQL_DATABASE: af_db
+
+  sql_ui:
+    image: phpmyadmin/phpmyadmin
+    container_name: sql_ui
+    depends_on:
+      - af_db
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=af_db
+      - MYSQL_ROOT_PASSWORD=test123
+    ports:
+      - 3080:80
+
+  node_client:
+    image: node:latest
+    command: /bin/bash -c "npm run watch"
+    container_name: node_client
+    working_dir: /var/www/html/
+    ports:
+      - 5555:80
+    volumes:
+      - ./web:/var/www/html/
