@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Blog\Admin;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Blog\Admin\BaseController;
+use App\Models\BlogCategory;
 
 class CategoryController extends BaseController
 {
@@ -14,7 +14,8 @@ class CategoryController extends BaseController
      */
     public function index()
     {
-        dd(__METHOD__);
+        $paginator = BlogCategory::paginate(5);
+        return view('blog.admin.category.index', compact('paginator'));
     }
 
     /**
@@ -46,7 +47,13 @@ class CategoryController extends BaseController
      */
     public function edit($id)
     {
-        dd(__METHOD__);
+        // $item = BlogCategory::find($id);
+        //$item = BlogCategory::where('id', '=', $id)->first();
+        $item = BlogCategory::findOrfail($id);//if not return 404
+
+        $categoryList = BlogCategory::all();
+
+        return view('blog.admin.category.edit', compact('item', 'categoryList'));
     }
 
     /**
@@ -58,6 +65,6 @@ class CategoryController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        dd(__METHOD__);
+        dd(__METHOD__, $request->all(), $id);
     }
 }
