@@ -52,14 +52,13 @@
                         </div>
 
                         <div class="form-group">
-                                <label for="description">Описание</label>
-                                <textarea id="description"
-                                          name="description"
-                                          class="form-control"
-                                          rows="3">
-                                    {{ $item->description }}
-                                </textarea>
-                            </div>
+                            <label for="description">Описание</label>
+                            <textarea name="description"
+                                        class="form-control"
+                                        rows="3">
+                                {{ old('description', $item->description) }}
+                            </textarea>
+                        </div>
                     </div>
                 </div>
             </div>
