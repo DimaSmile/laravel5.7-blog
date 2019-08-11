@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Blog\Admin;
 use Illuminate\Http\Request;
 use App\Models\BlogCategory;
 use App\Http\Requests\BlogCategoryUpdateRequest;
+use App\Http\Requests\BlogCategoryCreateRequest;
 
 class CategoryController extends BaseController
 {
@@ -15,7 +16,7 @@ class CategoryController extends BaseController
      */
     public function index()
     {
-        $paginator = BlogCategory::paginate(5);
+        $paginator = BlogCategory::paginate(15);
         return view('blog.admin.categories.index', compact('paginator'));
     }
 
@@ -26,7 +27,11 @@ class CategoryController extends BaseController
      */
     public function create()
     {
-        dd(__METHOD__);
+        $item = new BlogCategory();
+        $categoryList = BlogCategory::all();
+
+        return view('blog.admin.categories.edit',
+            compact('item', 'categoryList'));
     }
 
     /**
@@ -35,9 +40,31 @@ class CategoryController extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(BlogCategoryCreateRequest $request)
     {
-        dd(__METHOD__);
+        $data = $request->input();
+        if (empty($data['slug'])) {
+            $data['slug'] = str_slug($data['title']);
+        }
+
+        // 2 способа создания объекта модели и записи данных в бд:
+
+        //1) создаст объект но не добавить в бд
+        $item = new BlogCategory($data);
+        $item->save();//добавит запись в бд
+
+        // 2)создаст объект и добавит его в бд
+        // $item = (new BlogCategory())->create($data);
+
+        if ($item) {
+            return redirect()
+                ->route('blog.admin.categories.edit', [$item->id])
+                ->with(['success' => 'Успешно сохранено']);
+        } else {
+            return back()
+                ->withErrors(['msg' => "Ошибка сохранения"])
+                ->withInput();
+        }
     }
 
     /**
@@ -101,10 +128,16 @@ class CategoryController extends BaseController
         }
 
         $data = $request->all();
-        $result = $item
-            ->fill($data)//обновляем свойства объекта
-            ->save();//сохраняем их в базу
 
+        if (empty($data['slug'])) {
+            $data['slug'] = str_slug($data['title']);
+        }
+
+        $result = $item->update($data);//метод update включает в себя fill и save fill($data)->save()
+        /* 
+            ->fill($data)//обновляем свойства объекта
+             ->save();//сохраняем их в базу
+        */
         if ($result) {
             return redirect()
                 ->route('blog.admin.categories.edit', $item->id)
