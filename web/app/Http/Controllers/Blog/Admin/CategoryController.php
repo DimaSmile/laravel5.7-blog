@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Blog\Admin;
 
 use Illuminate\Http\Request;
 use App\Models\BlogCategory;
+use App\Http\Requests\BlogCategoryUpdateRequest;
 
 class CategoryController extends BaseController
 {
@@ -63,18 +64,18 @@ class CategoryController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(BlogCategoryUpdateRequest $request, $id)
     {
         // dd(__METHOD__, $request->all(), $id);
 
-        $rules = [
+       /*  $rules = [
             'title' => 'required|min:5|max:200',
             'slug' => 'max:200',
             'description' => 'string|max:500|min:3',
             'parent_id' => 'required|integer|exists:blog_categories,id',
-        ];
+        ]; */
 
-        // 3 способа валидации:
+        // 4 способа валидации:
         // 1)
         // $validateData = $this->validate($request, $rules); //валидация с помошью объекта контроллера
         // 2)
@@ -89,6 +90,7 @@ class CategoryController extends BaseController
         $validateData[] = $validator->fails();// если ошибка то вернет true (false если все хорошо)
         */
         
+        // 4) в одтельном классе, кастомная валидация, комманда для созания: php artisan make:request BlogCategoryUpdateRequest
 
         $item = BlogCategory::find($id);
 
