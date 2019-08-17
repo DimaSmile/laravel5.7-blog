@@ -10,6 +10,20 @@ use App\Repositories\BlogCategoryRepository;
 
 class CategoryController extends BaseController
 {
+
+    /**
+     * @var BlogCategoryRepository
+     */
+    private $blogCategoryRepository;
+
+    /**
+     * BaseController constructor
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->blogCategoryRepository = app(BlogCategoryRepository::class);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +31,8 @@ class CategoryController extends BaseController
      */
     public function index()
     {
-        $paginator = BlogCategory::paginate(15);
+        // $paginator = BlogCategory::paginate(15);
+        $paginator = $this->blogCategoryRepository->getAllWithPaginate(5);
         return view('blog.admin.categories.index', compact('paginator'));
     }
 
@@ -29,7 +44,8 @@ class CategoryController extends BaseController
     public function create()
     {
         $item = new BlogCategory();
-        $categoryList = BlogCategory::all();
+        // $categoryList = BlogCategory::all();
+        $categoryList = $this->blogCategoryRepository->getForComboBox();
 
         return view('blog.admin.categories.edit',
             compact('item', 'categoryList'));
@@ -76,19 +92,19 @@ class CategoryController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function edit($id, BlogCategoryRepository $categoryRepository)
+    public function edit($id)
     {
         // $item = BlogCategory::find($id);
         //$item = BlogCategory::where('id', '=', $id)->first();
         // $item = BlogCategory::findOrfail($id);//if not return 404
         // $categoryList = BlogCategory::all();
 
-        $item = $categoryRepository->getEdit($id);
+        $item = $this->blogCategoryRepository->getEdit($id);
 
         if (empty($item)) {
             abort(404);
         }
-        $categoryList = $categoryRepository->getForComboBox();
+        $categoryList = $this->blogCategoryRepository->getForComboBox();
 
         return view('blog.admin.categories.edit', compact('item', 'categoryList'));
     }
@@ -128,7 +144,8 @@ class CategoryController extends BaseController
         
         // 4) в одтельном классе, кастомная валидация, комманда для созания: php artisan make:request BlogCategoryUpdateRequest
 
-        $item = BlogCategory::find($id);
+        // $item = BlogCategory::find($id);
+        $item = $this->blogCategoryRepository->getEdit($id);
 
         if (empty($item)) {
             return back()
