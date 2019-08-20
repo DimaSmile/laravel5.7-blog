@@ -31,7 +31,10 @@ class PostController extends BaseController
      */
     public function index()
     {
-        return view("blog.admin.posts.index");
+
+        $paginator = $this->blogPostRepository->getAllWithPaginate();
+
+        return view("blog.admin.posts.index", compact('paginator'));
     }
 
     /**
@@ -41,7 +44,7 @@ class PostController extends BaseController
      */
     public function create()
     {
-        //
+        echo __METHOD__;
     }
 
     /**
@@ -74,7 +77,7 @@ class PostController extends BaseController
      */
     public function edit($id)
     {
-        //
+        echo __METHOD__;
     }
 
     /**
